@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veronica Cheung | Personal Colour Analysis</title>
+  <link rel="icon" type="image/svg+xml" href="image/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FAF8F5;
+      --warm-white: #FFFFFF;
+      --ink: #1A1916;
+      --ink-muted: #6B6860;
+      --ink-faint: #A8A59E;
+      --border: #E5E2DC;
+      --accent: #C4A882;
+      --accent-light: #F0E8DC;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250, 248, 245, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-name {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-name span {
+      color: var(--ink-muted);
+      font-weight: 300;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warm-white);
+      background: var(--ink);
+      border: none;
+      padding: 0.65rem 1.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .btn-primary:hover { background: #3A3830; }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      padding-top: 64px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Layer 1: the photo, dimmed */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('image/hero.jpg');
+      background-size: cover;
+      background-position: center top;
+      opacity: 0.35;
+      z-index: 0;
+    }
+
+    /* Layer 2: cream wash so text stays easy to read */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(250, 248, 245, 0.60);
+      z-index: 1;
+    }
+
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      padding: 5rem 5rem;
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 4vw, 4rem);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-h1 em {
+      font-style: italic;
+      color: var(--ink-muted);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      max-width: 420px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    /* ─── DIVIDER ─── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 3rem;
+    }
+
+    /* ─── SHARED ─── */
+    section { padding: 5rem 5rem; }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.9rem, 3vw, 2.6rem);
+      font-weight: 300;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 1.75rem;
+    }
+
+    .section-h2 em {
+      font-style: italic;
+      color: var(--ink-muted);
+    }
+
+    /* ─── PHILOSOPHY ─── */
+    #philosophy {
+      background: var(--warm-white);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    #philosophy p {
+      color: var(--ink-muted);
+      font-size: 1rem;
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+
+    #philosophy p:last-child { margin-bottom: 0; }
+
+    .cert-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      background: var(--cream);
+    }
+
+    .cert-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* ─── SERVICES ─── */
+    #services { background: var(--cream); }
+
+    .services-intro {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 4rem;
+      margin-bottom: 3.5rem;
+      align-items: start;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .service-card {
+      background: var(--warm-white);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .service-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .service-title {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .service-duration {
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      margin-bottom: 1.25rem;
+    }
+
+    .service-desc {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .service-list {
+      list-style: none;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      margin-bottom: 1.75rem;
+      flex: 1;
+    }
+
+    .service-list li {
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      padding: 0.35rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+    }
+
+    .service-list li::before {
+      content: '—';
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .service-price {
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .service-price a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .service-price a:hover { text-decoration: underline; }
+
+    /* ─── TESTIMONIAL ─── */
+    #testimonial {
+      background: var(--cream);
+      padding: 4rem 5rem;
+      text-align: center;
+    }
+
+    .testimonial-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink);
+      max-width: 680px;
+      margin: 0 auto 1.25rem;
+      line-height: 1.5;
+    }
+
+    .testimonial-attr {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      background: var(--warm-white);
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-image {
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: var(--accent-light);
+    }
+
+    .about-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .about-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      color: var(--ink-faint);
+      font-size: 0.8rem;
+    }
+
+    #about p {
+      color: var(--ink-muted);
+      font-size: 1rem;
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+
+    #about p:last-of-type { margin-bottom: 0; }
+
+    /* ─── CONTACT ─── */
+    #contact {
+      background: var(--ink);
+      color: var(--cream);
+    }
+
+    #contact .section-label { color: var(--accent); }
+    #contact .section-h2 { color: var(--cream); }
+    #contact .section-h2 em { color: #9E9890; }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .contact-intro p {
+      font-size: 0.95rem;
+      color: #9E9890;
+      line-height: 1.85;
+      margin-top: 1.25rem;
+    }
+
+    .contact-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #2E2C28;
+    }
+
+    .contact-detail-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5A5850;
+    }
+
+    .contact-detail a {
+      font-size: 0.9rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .contact-detail a:hover { text-decoration: underline; }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #5A5850;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      background: #222018;
+      border: 1px solid #2E2C28;
+      color: var(--cream);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #4A4840; }
+
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+
+    .btn-submit {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--cream);
+      border: none;
+      padding: 0.85rem 2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      align-self: flex-start;
+    }
+
+    .btn-submit:hover { background: var(--accent-light); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #0F0E0C;
+      color: #5A5850;
+      padding: 2rem 5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero-text { padding: 3rem 2rem; }
+      #philosophy { grid-template-columns: 1fr; gap: 2rem; }
+      section { padding: 3.5rem 2rem; }
+      .services-intro { grid-template-columns: 1fr; gap: 1rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      #about { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-image { aspect-ratio: 4/3; }
+      .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 2rem; }
+      nav { padding: 0 1.5rem; }
+      .section-divider { margin: 0 2rem; }
+      #testimonial { padding: 3rem 2rem; }
+    }
+
+    
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-name">Veronica Cheung <span>| Personal Colour Analysis</span></a>
+    <a href="#contact" class="btn-primary">Book a Consultation</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">JPCA-Certified Colour Analyst · London</p>
+      <h1 class="hero-h1">Find the Colours<br>That <em>Truly</em> Suit You</h1>
+      <p class="hero-sub">Personal colour analysis to help you look brighter, feel more confident, and build a wardrobe that works effortlessly.</p>
+      <a href="mailto:color@veronicacheung.com" class="btn-primary">Get in Touch</a>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- PHILOSOPHY -->
+  <section id="philosophy">
+    <div>
+      <p class="section-label">The Approach</p>
+      <h2 class="section-h2">Beyond Fashion,<br><em>Towards Wellbeing</em></h2>
+      <div class="cert-badge">NPO Japan Personal Colour Association</div>
+    </div>
+    <div>
+      <p>Colour is more than a visual choice. It shapes how you feel. The right shades can brighten your complexion, bring clarity to your features, and create a sense of ease in how you present yourself.</p>
+      <p>Using the structured methodology of the NPO Japan Personal Colour Association, I offer a precise and objective approach to personal colour analysis. Together, we will identify a palette that works in harmony with your natural colouring, so you can dress with confidence, not guesswork.</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="services-intro">
+      <div>
+        <p class="section-label">Services</p>
+        <h2 class="section-h2">What I<br><em>Offer</em></h2>
+      </div>
+      <p style="color: var(--ink-muted); font-size: 0.95rem; line-height: 1.85; padding-top: 0.5rem;">
+        Every session is built around you: your natural colouring, your lifestyle, and the confidence you want to carry into every outfit. Sessions are available individually or as a shared group experience.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <p class="service-tag">One-to-one</p>
+        <h3 class="service-title">Individual Diagnosis</h3>
+        <p class="service-duration">60 minutes · Private session</p>
+        <p class="service-desc">A private session dedicated to discovering your personal colour palette. Using precise draping techniques, we will identify the tones that enhance your natural features and bring out your best.</p>
+        <ul class="service-list">
+          <li>Your seasonal colour profile</li>
+          <li>Clear guidance on colours to wear and avoid</li>
+          <li>Practical advice for clothing, accessories, and everyday styling</li>
+        </ul>
+        <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+      </div>
+
+      <div class="service-card">
+        <p class="service-tag">Group</p>
+        <h3 class="service-title">Group Workshop</h3>
+        <p class="service-duration">Flexible duration · 4–10 guests</p>
+        <p class="service-desc">A shared and interactive experience exploring colour theory and personal palettes with friends or colleagues. Ideal for those who want to learn together in a relaxed and engaging setting.</p>
+        <ul class="service-list">
+          <li>Introduction to personal colour analysis principles</li>
+          <li>Interactive exercises across different palettes</li>
+          <li>A deeper understanding of how colour works across individuals</li>
+        </ul>
+        <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- TESTIMONIAL -->
+  <section id="testimonial">
+    <p class="testimonial-quote">"I had no idea how much difference the right colours could make. Veronica completely changed how I think about getting dressed."</p>
+    <p class="testimonial-attr">— Workshop attendee, London</p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-image">
+      <!--
+        ADD YOUR PORTRAIT HERE
+        1. Put your photo file inside the images/ folder
+        2. Delete the placeholder div below
+        3. Uncomment and update this line:
+        <img src="images/portrait.jpg" alt="Veronica Cheung, Personal Colour Analyst" />
+      -->
+      <img src="image/portfolio.JPG" alt="Veronica Cheung, Personal Colour Analyst" />
+    </div>
+    <div>
+      <p class="section-label">About</p>
+      <h2 class="section-h2">Meet Your<br><em>Consultant</em></h2>
+      <p>I am Veronica, a London-based certified Personal Colour Analyst trained by the NPO Japan Personal Colour Association. My approach combines technical precision with a focus on everyday practicality.</p>
+      <p>I believe colour is not about following trends, but about understanding what works for you. By identifying the tones that naturally complement you, I help you build confidence in your choices and create a sense of ease in your personal style.</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-layout">
+      <div class="contact-intro">
+        <p class="section-label">Enquire &amp; Book</p>
+        <h2 class="section-h2">Ready to Discover<br><em>Your Colours?</em></h2>
+        <p>Fill in the form and I will be in touch to discuss the best session for you, whether you are curious about a private diagnosis or planning a group workshop.</p>
+        <div class="contact-detail">
+          <span class="contact-detail-label">Email</span>
+          <a href="mailto:color@veronicacheung.com">color@veronicacheung.com</a>
+        </div>
+      </div>
+      <form action="mailto:color@veronicacheung.com" method="POST" enctype="text/plain">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Full name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="How can I help you?"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send Enquiry</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 Veronica Cheung</span>
+    <span>Personal Colour Analysis · London</span>
+    <a href="mailto:color@veronicacheung.com">color@veronicacheung.com</a>
+  </footer>
+
+</body>
+</html>

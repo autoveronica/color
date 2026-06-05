@@ -7,351 +7,642 @@
   <link rel="icon" type="image/svg+xml" href="image/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream: #FAF8F5;
-      --warm-white: #FFFFFF;
-      --ink: #1A1916;
-      --ink-muted: #6B6860;
-      --ink-faint: #A8A59E;
-      --border: #E5E2DC;
-      --accent: #C4A882;
-      --accent-light: #F0E8DC;
-      --serif: 'Cormorant Garamond', Georgia, serif;
+      --white: #ffffff;
+      --off-white: #F7F6F3;
+      --light: #EFEFED;
+      --ink: #111110;
+      --ink-mid: #444440;
+      --ink-muted: #888884;
+      --border: #E0DED9;
+      --accent: #1460FF;
+      --accent-2: #FF5C1A;
+      --serif: 'Syne', sans-serif;
       --sans: 'DM Sans', system-ui, sans-serif;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--cream);
+      background: var(--off-white);
       color: var(--ink);
       font-family: var(--sans);
       font-size: 16px;
       line-height: 1.7;
       font-weight: 300;
+      overflow-x: hidden;
     }
 
     /* ─── NAV ─── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(250, 248, 245, 0.92);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      z-index: 200;
       padding: 0 2.5rem;
       height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(247, 246, 243, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
 
     .nav-name {
       font-family: var(--serif);
-      font-size: 1.1rem;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: #fff;
       text-decoration: none;
+      transition: color 0.3s;
     }
 
-    .nav-name span {
-      color: var(--ink-muted);
-      font-weight: 300;
+    nav.scrolled .nav-name { color: var(--ink); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
     }
 
-    .btn-primary {
-      display: inline-block;
+    .nav-link {
       font-family: var(--sans);
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 400;
-      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.3s;
+    }
+
+    nav.scrolled .nav-link { color: var(--ink-muted); }
+    .nav-link:hover { color: var(--accent) !important; }
+
+    .btn-nav {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--warm-white);
-      background: var(--ink);
+      color: var(--ink);
+      background: #fff;
       border: none;
-      padding: 0.65rem 1.5rem;
+      padding: 0.55rem 1.25rem;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s ease;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
     }
 
-    .btn-primary:hover { background: #3A3830; }
+    .btn-nav:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+
+    nav.scrolled .btn-nav { background: var(--accent); color: #fff; }
+    nav.scrolled .btn-nav:hover { background: var(--ink); }
 
     /* ─── HERO ─── */
     #hero {
       min-height: 100vh;
-      padding-top: 64px;
       position: relative;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       overflow: hidden;
     }
 
-    /* Layer 1: the photo, dimmed */
-    #hero::before {
-      content: '';
+    #hero-canvas {
       position: absolute;
       inset: 0;
-      background-image: url('image/hero.jpg');
-      background-size: cover;
-      background-position: center top;
-      opacity: 0.35;
+      width: 100%;
+      height: 100%;
       z-index: 0;
+      display: block;
     }
 
-    /* Layer 2: cream wash so text stays easy to read */
     #hero::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(250, 248, 245, 0.60);
+      background: linear-gradient(
+        160deg,
+        rgba(4, 12, 30, 0.18) 0%,
+        rgba(4, 12, 30, 0.0) 50%,
+        rgba(4, 12, 30, 0.55) 100%
+      );
       z-index: 1;
+      pointer-events: none;
     }
 
     .hero-text {
       position: relative;
       z-index: 2;
-      padding: 5rem 5rem;
-      max-width: 680px;
+      padding: 0 5rem 5rem;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: flex-end;
     }
 
+    .hero-left {}
+
     .hero-eyebrow {
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: rgba(255,255,255,0.7);
       margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 2px;
+      background: var(--accent-2);
     }
 
     .hero-h1 {
       font-family: var(--serif);
-      font-size: clamp(2.8rem, 4vw, 4rem);
-      font-weight: 300;
-      line-height: 1.15;
-      color: var(--ink);
-      margin-bottom: 1.5rem;
+      font-size: clamp(3rem, 8vw, 8rem);
+      font-weight: 500;
+      line-height: 1.0;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0;
     }
 
-    .hero-h1 em {
-      font-style: italic;
-      color: var(--ink-muted);
+    .hero-h1 .outline {
+      -webkit-text-stroke: 2px rgba(255,255,255,0.6);
+      color: transparent;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 4rem;
     }
 
     .hero-sub {
-      font-size: 1rem;
-      color: var(--ink-muted);
-      max-width: 420px;
-      margin-bottom: 2.5rem;
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 380px;
+      margin-bottom: 2rem;
       line-height: 1.8;
     }
 
-    /* ─── DIVIDER ─── */
-    .section-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 0 3rem;
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    /* ─── SHARED ─── */
-    section { padding: 5rem 5rem; }
+    .btn-hero-primary {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: #fff;
+      border: none;
+      padding: 0.85rem 2rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
 
-    .section-label {
-      font-size: 0.72rem;
+    .btn-hero-primary:hover { background: var(--accent-2); color: #fff; transform: translateY(-2px); }
+
+    .btn-hero-ghost {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 0.85rem 2rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-hero-ghost:hover { border-color: rgba(255,255,255,0.9); color: #fff; }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-scroll span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: rgba(255,255,255,0.3);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(0.6); }
+    }
+
+    /* ─── SHARED SECTION ─── */
+    .section-wrap {
+      padding: 6rem 5rem;
+    }
+
+    .label-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 500;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .label-tag::before {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 2px;
+      background: var(--accent);
     }
 
     .section-h2 {
       font-family: var(--serif);
-      font-size: clamp(1.9rem, 3vw, 2.6rem);
-      font-weight: 300;
-      line-height: 1.25;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 500;
+      line-height: 1.1;
       color: var(--ink);
+      letter-spacing: -0.02em;
       margin-bottom: 1.75rem;
     }
 
     .section-h2 em {
       font-style: italic;
-      color: var(--ink-muted);
+      color: var(--accent);
+      font-weight: 400;
     }
 
     /* ─── PHILOSOPHY ─── */
     #philosophy {
-      background: var(--warm-white);
+      background: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .philosophy-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      align-items: center;
+      grid-template-columns: 5fr 7fr;
+      gap: 6rem;
+      align-items: start;
+      padding: 6rem 5rem;
     }
 
-    #philosophy p {
-      color: var(--ink-muted);
-      font-size: 1rem;
-      line-height: 1.85;
-      margin-bottom: 1rem;
-    }
-
-    #philosophy p:last-child { margin-bottom: 0; }
+    .philosophy-left {}
 
     .cert-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--border);
-      font-size: 0.75rem;
+      padding: 0.45rem 0.9rem;
+      border: 1.5px solid var(--accent);
+      font-size: 0.7rem;
+      font-weight: 500;
       letter-spacing: 0.08em;
-      color: var(--ink-muted);
-      background: var(--cream);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 1.5rem;
     }
 
-    .cert-badge::before {
-      content: '';
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
+    .philosophy-right {}
+
+    .philosophy-right p {
+      color: var(--ink-mid);
+      font-size: 1.1rem;
+      line-height: 1.9;
+      margin-bottom: 1.25rem;
+    }
+
+    .philosophy-right p:last-child { margin-bottom: 0; }
+
+    .philosophy-right p strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* ─── STATS ─── */
+    #stats {
+      position: relative;
+      padding: 5rem;
+      overflow: hidden;
+    }
+
+    #stats-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+
+    .stats-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .stat-item {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .stat-item:last-child { border-right: none; }
+    .stat-item:hover { background: rgba(255,255,255,0.04); }
+
+    .stat-number {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 4vw, 4rem);
+      font-weight: 500;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-number span {
+      color: var(--accent-2);
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.5;
     }
 
     /* ─── SERVICES ─── */
-    #services { background: var(--cream); }
+    #services {
+      background: var(--off-white);
+      border-top: 1px solid var(--border);
+    }
 
-    .services-intro {
+    .services-header {
       display: grid;
-      grid-template-columns: 1fr 2fr;
+      grid-template-columns: 1fr 1fr;
       gap: 4rem;
-      margin-bottom: 3.5rem;
-      align-items: start;
+      align-items: end;
+      margin-bottom: 4rem;
+      padding: 6rem 5rem 0;
+    }
+
+    .services-header-right p {
+      color: var(--ink-muted);
+      font-size: 1.1rem;
+      line-height: 1.85;
     }
 
     .services-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1px;
+      gap: 1.5px;
       background: var(--border);
-      border: 1px solid var(--border);
+      margin: 0 5rem;
+      padding-bottom: 6rem;
     }
 
     .service-card {
-      background: var(--warm-white);
-      padding: 2.5rem;
+      background: var(--white);
+      padding: 0;
       display: flex;
       flex-direction: column;
+      transition: background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { background: #FAFAFA; }
+
+    /* inner content gets the padding */
+    .service-card-top {
+      padding: 3rem 3rem 1.5rem 3rem;
+    }
+
+    .service-card-bottom {
+      padding: 1.5rem 3rem 3rem 3rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .service-tag {
-      font-size: 0.72rem;
-      letter-spacing: 0.15em;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
 
     .service-title {
       font-family: var(--serif);
-      font-size: 1.55rem;
-      font-weight: 400;
+      font-size: 1.75rem;
+      font-weight: 500;
       color: var(--ink);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.01em;
     }
 
     .service-duration {
-      font-size: 0.8rem;
-      color: var(--ink-faint);
-      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
     }
 
     .service-desc {
-      font-size: 0.92rem;
-      color: var(--ink-muted);
+      font-size: 0.93rem;
+      color: var(--ink-mid);
       line-height: 1.8;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
     }
 
     .service-list {
       list-style: none;
       border-top: 1px solid var(--border);
       padding-top: 1.25rem;
-      margin-bottom: 1.75rem;
+      margin-bottom: 2rem;
       flex: 1;
     }
 
     .service-list li {
       font-size: 0.88rem;
-      color: var(--ink-muted);
-      padding: 0.35rem 0;
+      color: var(--ink-mid);
+      padding: 0.4rem 0;
       display: flex;
       align-items: flex-start;
-      gap: 0.65rem;
+      gap: 0.75rem;
     }
 
     .service-list li::before {
-      content: '—';
+      content: '→';
       color: var(--accent);
       flex-shrink: 0;
+      font-size: 0.85rem;
     }
 
     .service-price {
-      font-size: 0.8rem;
-      color: var(--ink-faint);
-      padding-top: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      padding-top: 1rem;
       border-top: 1px solid var(--border);
+      margin-top: auto;
     }
 
     .service-price a {
       color: var(--accent);
       text-decoration: none;
+      font-weight: 500;
     }
 
     .service-price a:hover { text-decoration: underline; }
 
+    /* image flush to card edges, fixed height */
+    .card-img-wrap {
+      width: 100%;
+      height: 260px;
+      flex-shrink: 0;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
     /* ─── TESTIMONIAL ─── */
     #testimonial {
-      background: var(--cream);
-      padding: 4rem 5rem;
+      background: var(--accent);
+      padding: 6rem 5rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #testimonial::before {
+      content: '"';
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--serif);
+      font-size: 20rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.06);
+      line-height: 1;
+      pointer-events: none;
     }
 
     .testimonial-quote {
       font-family: var(--serif);
-      font-size: clamp(1.3rem, 2.5vw, 1.9rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--ink);
-      max-width: 680px;
-      margin: 0 auto 1.25rem;
-      line-height: 1.5;
+      font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+      font-weight: 500;
+      color: #fff;
+      max-width: 760px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      position: relative;
+      z-index: 1;
     }
 
     .testimonial-attr {
       font-size: 0.8rem;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--ink-faint);
+      color: rgba(255,255,255,0.6);
+      position: relative;
+      z-index: 1;
     }
 
     /* ─── ABOUT ─── */
     #about {
-      background: var(--warm-white);
+      background: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .about-inner {
       display: grid;
       grid-template-columns: 5fr 7fr;
-      gap: 5rem;
+      gap: 6rem;
       align-items: center;
+      padding: 6rem 5rem;
     }
 
     .about-image {
       aspect-ratio: 3/4;
       overflow: hidden;
-      background: var(--accent-light);
+      background: var(--light);
+      position: relative;
+    }
+
+    .about-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid rgba(0,0,0,0.06);
     }
 
     .about-image img {
@@ -360,72 +651,72 @@
       object-fit: cover;
       object-position: center top;
       display: block;
+      transition: transform 0.6s ease;
     }
 
-    .about-image-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      color: var(--ink-faint);
-      font-size: 0.8rem;
+    .about-image:hover img { transform: scale(1.03); }
+
+    .about-content p {
+      color: var(--ink-mid);
+      font-size: 1.1rem;
+      line-height: 1.9;
+      margin-bottom: 1.25rem;
     }
 
-    #about p {
-      color: var(--ink-muted);
-      font-size: 1rem;
-      line-height: 1.85;
-      margin-bottom: 1rem;
-    }
+    .about-content p:last-of-type { margin-bottom: 0; }
 
-    #about p:last-of-type { margin-bottom: 0; }
+    .about-content p strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
 
     /* ─── CONTACT ─── */
     #contact {
       background: var(--ink);
-      color: var(--cream);
+      color: var(--white);
     }
 
-    #contact .section-label { color: var(--accent); }
-    #contact .section-h2 { color: var(--cream); }
-    #contact .section-h2 em { color: #9E9890; }
-
-    .contact-layout {
+    .contact-inner {
       display: grid;
       grid-template-columns: 1fr 1.4fr;
-      gap: 5rem;
+      gap: 6rem;
       align-items: start;
+      padding: 6rem 5rem;
     }
 
-    .contact-intro p {
-      font-size: 0.95rem;
-      color: #9E9890;
+    .contact-intro .label-tag { color: var(--accent-2); }
+    .contact-intro .label-tag::before { background: var(--accent-2); }
+
+    .contact-intro .section-h2 { color: #fff; }
+    .contact-intro .section-h2 em { color: rgba(255,255,255,0.45); }
+
+    .contact-intro > p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.55);
       line-height: 1.85;
-      margin-top: 1.25rem;
+      margin-top: 1rem;
     }
 
     .contact-detail {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 2rem;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-top: 2.5rem;
       padding-top: 2rem;
-      border-top: 1px solid #2E2C28;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
     .contact-detail-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #5A5850;
+      color: rgba(255,255,255,0.35);
     }
 
     .contact-detail a {
-      font-size: 0.9rem;
-      color: var(--accent);
+      font-size: 0.95rem;
+      color: var(--accent-2);
       text-decoration: none;
     }
 
@@ -446,207 +737,283 @@
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.45rem;
     }
 
     .form-group label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
+      font-weight: 500;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: #5A5850;
+      color: rgba(255,255,255,0.4);
     }
 
     .form-group input,
     .form-group textarea {
-      background: #222018;
-      border: 1px solid #2E2C28;
-      color: var(--cream);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
       font-family: var(--sans);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 300;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1.1rem;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
       resize: none;
     }
 
     .form-group input::placeholder,
-    .form-group textarea::placeholder { color: #4A4840; }
+    .form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
 
     .form-group input:focus,
-    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.08);
+    }
 
     .btn-submit {
       font-family: var(--sans);
       font-size: 0.8rem;
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--ink);
-      background: var(--cream);
+      background: #fff;
       border: none;
-      padding: 0.85rem 2rem;
+      padding: 0.95rem 2.5rem;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
       align-self: flex-start;
     }
 
-    .btn-submit:hover { background: var(--accent-light); }
+    .btn-submit:hover { background: var(--accent-2); color: #fff; transform: translateY(-2px); }
 
     /* ─── FOOTER ─── */
     footer {
-      background: #0F0E0C;
-      color: #5A5850;
-      padding: 2rem 5rem;
+      background: #0A0A09;
+      color: rgba(255,255,255,0.3);
+      padding: 1.75rem 5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
     }
 
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    footer a { color: rgba(255,255,255,0.45); text-decoration: none; }
+    footer a:hover { color: var(--accent-2); }
+
+    /* ─── FADE-IN ANIMATIONS ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 900px) {
-      .hero-text { padding: 3rem 2rem; }
-      #philosophy { grid-template-columns: 1fr; gap: 2rem; }
-      section { padding: 3.5rem 2rem; }
-      .services-intro { grid-template-columns: 1fr; gap: 1rem; }
-      .services-grid { grid-template-columns: 1fr; }
-      #about { grid-template-columns: 1fr; gap: 2.5rem; }
-      .about-image { aspect-ratio: 4/3; }
-      .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
-      .form-row { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 2rem; }
       nav { padding: 0 1.5rem; }
-      .section-divider { margin: 0 2rem; }
-      #testimonial { padding: 3rem 2rem; }
-    }
 
-    
+      .hero-text { padding: 0 2rem 4rem; grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero-h1 { font-size: clamp(2.6rem, 10vw, 3.5rem); }
+
+      .philosophy-inner,
+      .about-inner,
+      .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; padding: 4rem 2rem; }
+
+      .section-wrap { padding: 4rem 2rem; }
+
+      .services-header { grid-template-columns: 1fr; gap: 1rem; padding: 4rem 2rem 0; }
+      .services-grid { grid-template-columns: 1fr; margin: 0 2rem; padding-bottom: 4rem; }
+
+      #stats { padding: 3.5rem 2rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-item { border-bottom: 1px solid rgba(255,255,255,0.08); }
+      .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.08); }
+      .stat-item:nth-child(even) { border-right: none; }
+      .stat-item:nth-last-child(-n+2) { border-bottom: none; }
+
+      #testimonial { padding: 4rem 2rem; }
+
+      .about-image { aspect-ratio: 4/3; }
+
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1.5rem 2rem; }
+
+      .nav-link { display: none; }
+    }
   </style>
 </head>
 <body>
+
   <!-- NAV -->
-  <nav>
-    <a href="#hero" class="nav-name">Veronica Cheung <span>| Personal Colour Analysis</span></a>
-    <a href="#contact" class="btn-primary">Book a Consultation</a>
+  <nav id="main-nav">
+    <a href="#hero" class="nav-name">Arata Studio</a>
+    <div class="nav-right">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#contact" class="btn-nav">Book Now</a>
+    </div>
   </nav>
 
   <!-- HERO -->
   <section id="hero">
+    <canvas id="hero-canvas"></canvas>
     <div class="hero-text">
-      <p class="hero-eyebrow">JPCA-Certified Colour Analyst · London</p>
-      <h1 class="hero-h1">Find the Colours<br>That <em>Truly</em> Suit You</h1>
-      <p class="hero-sub">Personal colour analysis to help you look brighter, feel more confident, and build a wardrobe that works effortlessly.</p>
-      <a href="mailto:color@veronicacheung.com" class="btn-primary">Get in Touch</a>
+      <div class="hero-left">
+        <p class="hero-eyebrow">JPCA-Certified Colour Analyst · London</p>
+        <h1 class="hero-h1">Find<br>Your<br><span class="outline">Colours.</span></h1>
+      </div>
+      <div class="hero-right">
+        <p class="hero-sub">Personal colour analysis to help you look brighter, feel more confident, and build a wardrobe that works effortlessly — every single day.</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn-hero-primary">Book a Consultation</a>
+          <a href="#services" class="btn-hero-ghost">See Services</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
-
-  <div class="section-divider"></div>
 
   <!-- PHILOSOPHY -->
   <section id="philosophy">
-    <div>
-      <p class="section-label">The Approach</p>
-      <h2 class="section-h2">Beyond Fashion,<br><em>Towards Wellbeing</em></h2>
-      <div class="cert-badge">NPO Japan Personal Colour Association</div>
-    </div>
-    <div>
-      <p>Colour is more than a visual choice. It shapes how you feel. The right shades can brighten your complexion, bring clarity to your features, and create a sense of ease in how you present yourself.</p>
-      <p>Using the structured methodology of the NPO Japan Personal Colour Association, I offer a precise and objective approach to personal colour analysis. Together, we will identify a palette that works in harmony with your natural colouring, so you can dress with confidence, not guesswork.</p>
+    <div class="philosophy-inner">
+      <div class="philosophy-left reveal">
+        <p class="label-tag">The Approach</p>
+        <h2 class="section-h2">Beyond Fashion,<br><em>Towards Wellbeing</em></h2>
+        <div class="cert-badge">NPO Japan Personal Colour Association</div>
+      </div>
+      <div class="philosophy-right reveal reveal-delay-1">
+        <p>Colour is more than a visual choice. It shapes how you feel. The right shades can <strong>brighten your complexion</strong>, bring clarity to your features, and create a sense of ease in how you present yourself.</p>
+        <p>Using the structured methodology of the NPO Japan Personal Colour Association, I offer a precise and objective approach to personal colour analysis. Together, we will identify a palette that works in harmony with your natural colouring — so you can dress with <strong>confidence, not guesswork</strong>.</p>
+      </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <!-- STATS -->
+  <section id="stats">
+    <canvas id="stats-canvas"></canvas>
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <p class="stat-number">60<span>+</span></p>
+        <p class="stat-label">Clients Styled</p>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <p class="stat-number">4</p>
+        <p class="stat-label">Industry-Recognised Certifications</p>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <p class="stat-number">3</p>
+        <p class="stat-label">International Markets Served</p>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <p class="stat-number">10<span>+</span></p>
+        <p class="stat-label">Workshops & Collaborations</p>
+      </div>
+    </div>
+  </section>
 
   <!-- SERVICES -->
   <section id="services">
-    <div class="services-intro">
-      <div>
-        <p class="section-label">Services</p>
+    <div class="services-header">
+      <div class="reveal">
+        <p class="label-tag">Services</p>
         <h2 class="section-h2">What I<br><em>Offer</em></h2>
       </div>
-      <p style="color: var(--ink-muted); font-size: 0.95rem; line-height: 1.85; padding-top: 0.5rem;">
-        Every session is built around you: your natural colouring, your lifestyle, and the confidence you want to carry into every outfit. Sessions are available individually or as a shared group experience.
-      </p>
+      <div class="reveal reveal-delay-1">
+        <p class="services-header-right">Every session is built around you — your natural colouring, your lifestyle, and the confidence you want to carry into every outfit.</p>
+      </div>
     </div>
-
     <div class="services-grid">
-      <div class="service-card">
-        <p class="service-tag">One-to-one</p>
-        <h3 class="service-title">Individual Diagnosis</h3>
-        <p class="service-duration">60 minutes · Private session</p>
-        <p class="service-desc">A private session dedicated to discovering your personal colour palette. Using precise draping techniques, we will identify the tones that enhance your natural features and bring out your best.</p>
-        <ul class="service-list">
-          <li>Your seasonal colour profile</li>
-          <li>Clear guidance on colours to wear and avoid</li>
-          <li>Practical advice for clothing, accessories, and everyday styling</li>
-        </ul>
-        <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+
+      <div class="service-card reveal">
+        <div class="service-card-top">
+          <p class="service-tag">One-to-one</p>
+          <h3 class="service-title">Individual Diagnosis</h3>
+          <p class="service-duration">60 minutes · Private session</p>
+          <p class="service-desc">A private session dedicated to discovering your personal colour palette. Using precise draping techniques, we identify the tones that enhance your natural features and bring out your best.</p>
+        </div>
+        <div class="card-img-wrap">
+          <img src="image/1on1.png" alt="One-to-one colour analysis session" />
+        </div>
+        <div class="service-card-bottom">
+          <ul class="service-list">
+            <li>Your seasonal colour profile</li>
+            <li>Clear guidance on colours to wear and avoid</li>
+            <li>Practical advice for clothing, accessories, and everyday styling</li>
+          </ul>
+          <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+        </div>
       </div>
 
-      <div class="service-card">
-        <p class="service-tag">Group</p>
-        <h3 class="service-title">Group Workshop</h3>
-        <p class="service-duration">Flexible duration · 4–10 guests</p>
-        <p class="service-desc">A shared and interactive experience exploring colour theory and personal palettes with friends or colleagues. Ideal for those who want to learn together in a relaxed and engaging setting.</p>
-        <ul class="service-list">
-          <li>Introduction to personal colour analysis principles</li>
-          <li>Interactive exercises across different palettes</li>
-          <li>A deeper understanding of how colour works across individuals</li>
-        </ul>
-        <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-card-top">
+          <p class="service-tag">Group</p>
+          <h3 class="service-title">Group Workshop</h3>
+          <p class="service-duration">Flexible duration · One-off or series · Group size by arrangement</p>
+          <p class="service-desc">A shared and interactive experience exploring colour theory and personal palettes with friends or colleagues. Ideal for those who want to learn together in a relaxed, engaging setting.</p>
+        </div>
+        <div class="card-img-wrap">
+          <img src="image/workshop.jpg" alt="Group colour analysis workshop" />
+        </div>
+        <div class="service-card-bottom">
+          <ul class="service-list">
+            <li>Introduction to personal colour analysis principles</li>
+            <li>Interactive exercises across different palettes</li>
+            <li>A deeper understanding of how colour works across individuals</li>
+          </ul>
+          <p class="service-price">Pricing available on request &nbsp;·&nbsp; <a href="#contact">Enquire →</a></p>
+        </div>
       </div>
+
     </div>
   </section>
-
-  <div class="section-divider"></div>
 
   <!-- TESTIMONIAL -->
   <section id="testimonial">
-    <p class="testimonial-quote">"I had no idea how much difference the right colours could make. Veronica completely changed how I think about getting dressed."</p>
-    <p class="testimonial-attr">— Workshop attendee, London</p>
+    <p class="testimonial-quote reveal">"I had no idea how much difference the right colours could make. Veronica completely changed how I think about getting dressed."</p>
+    <p class="testimonial-attr reveal reveal-delay-1">— Workshop attendee, London</p>
   </section>
-
-  <div class="section-divider"></div>
 
   <!-- ABOUT -->
   <section id="about">
-    <div class="about-image">
-      <!--
-        ADD YOUR PORTRAIT HERE
-        1. Put your photo file inside the images/ folder
-        2. Delete the placeholder div below
-        3. Uncomment and update this line:
-        <img src="images/portrait.jpg" alt="Veronica Cheung, Personal Colour Analyst" />
-      -->
-      <img src="image/portfolio.JPG" alt="Veronica Cheung, Personal Colour Analyst" />
-    </div>
-    <div>
-      <p class="section-label">About</p>
-      <h2 class="section-h2">Meet Your<br><em>Consultant</em></h2>
-      <p>I am Veronica, a London-based certified Personal Colour Analyst trained by the NPO Japan Personal Colour Association. My approach combines technical precision with a focus on everyday practicality.</p>
-      <p>I believe colour is not about following trends, but about understanding what works for you. By identifying the tones that naturally complement you, I help you build confidence in your choices and create a sense of ease in your personal style.</p>
+    <div class="about-inner">
+      <div class="about-image reveal">
+        <img src="image/about_veronica.png" alt="Veronica Cheung, Personal Colour Analyst" />
+      </div>
+      <div class="about-content reveal reveal-delay-1">
+        <p class="label-tag">About</p>
+        <h2 class="section-h2">Meet Your<br><em>Consultant</em></h2>
+        <p>I am <strong>Veronica</strong>, a London-based certified Personal Colour Analyst trained by the NPO Japan Personal Colour Association. My approach combines technical precision with a focus on everyday practicality.</p>
+        <p>I believe colour is not about following trends — it's about understanding what works for <strong>you</strong>. By identifying the tones that naturally complement you, I help you build confidence in your choices and create a sense of ease in your personal style.</p>
+      </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
-
   <!-- CONTACT -->
   <section id="contact">
-    <div class="contact-layout">
-      <div class="contact-intro">
-        <p class="section-label">Enquire &amp; Book</p>
+    <div class="contact-inner">
+      <div class="contact-intro reveal">
+        <p class="label-tag">Enquire &amp; Book</p>
         <h2 class="section-h2">Ready to Discover<br><em>Your Colours?</em></h2>
-        <p>Fill in the form and I will be in touch to discuss the best session for you, whether you are curious about a private diagnosis or planning a group workshop.</p>
+        <p>Fill in the form and I will be in touch to discuss the best session for you — whether you are curious about a private diagnosis or planning a group workshop.</p>
         <div class="contact-detail">
           <span class="contact-detail-label">Email</span>
           <a href="mailto:color@veronicacheung.com">color@veronicacheung.com</a>
         </div>
       </div>
-      <form action="https://formspree.io/f/xaqvqkwo" method="POST">
+      <form action="https://formspree.io/f/xaqvqkwo" method="POST" class="reveal reveal-delay-1">
         <div class="form-row">
           <div class="form-group">
             <label for="name">Your Name</label>
@@ -668,10 +1035,193 @@
 
   <!-- FOOTER -->
   <footer>
-    <span>© 2026 Veronica Cheung</span>
+    <span>© 2026 Arata Studio</span>
     <span>Personal Colour Analysis · London</span>
     <a href="mailto:color@veronicacheung.com">color@veronicacheung.com</a>
   </footer>
+
+  <!-- THREE.JS HERO GRADIENT -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script>
+  (function () {
+    const canvas = document.getElementById('hero-canvas');
+    const section = document.getElementById('hero');
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(section.clientWidth, section.clientHeight);
+
+    const mouse = new THREE.Vector2(0.5, 0.5);
+    const smooth = new THREE.Vector2(0.5, 0.5);
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX / window.innerWidth;
+      mouse.y = 1 - e.clientY / window.innerHeight;
+    });
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:       { value: 0 },
+        uMouse:      { value: new THREE.Vector2(0.5, 0.5) },
+        uResolution: { value: new THREE.Vector2(section.clientWidth, section.clientHeight) }
+      },
+      vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+      fragmentShader: `
+        precision highp float;
+        uniform float uTime;
+        uniform vec2 uMouse, uResolution;
+
+        vec3 deepBlue   = vec3(0.04, 0.18, 0.38);
+        vec3 midBlue    = vec3(0.10, 0.40, 0.82);
+        vec3 lightBlue  = vec3(0.55, 0.78, 1.00);
+        vec3 softPink   = vec3(0.95, 0.72, 0.82);
+        vec3 warmYellow = vec3(1.00, 0.82, 0.20);
+        vec3 hotOrange  = vec3(1.00, 0.38, 0.10);
+
+        float fbm(vec2 p, float t) {
+          float v = 0.0;
+          v += sin(p.x * 1.8 + t * 0.7) * cos(p.y * 1.5 - t * 0.5);
+          v += sin(p.x * 3.2 - t * 0.4) * sin(p.y * 2.8 + t * 0.6) * 0.5;
+          v += cos(p.x * 5.1 + t * 0.3) * cos(p.y * 4.3 - t * 0.4) * 0.25;
+          return v;
+        }
+
+        void main() {
+          vec2 uv = gl_FragCoord.xy / uResolution.xy;
+          float aspect = uResolution.x / uResolution.y;
+          vec2 st = uv;
+          st.x *= aspect;
+
+          float t = uTime;
+          float warp = fbm(st * 1.2, t);
+          st.x += warp * 0.22;
+          st.y += fbm(st * 1.4 + 1.7, t) * 0.20;
+
+          float diag = st.x * 0.6 - st.y * 0.8 + sin(t * 0.3) * 0.2;
+          float m = clamp(diag * 0.5 + 0.5, 0.0, 1.0);
+
+          float burstR = 0.55 + 0.25 * (1.0 / aspect);
+          vec2 burstCenter = vec2(aspect * 0.78 + sin(t*0.25)*0.10, 0.85 + cos(t*0.2)*0.08);
+          float burst = 1.0 - smoothstep(0.0, burstR, distance(st, burstCenter));
+
+          float pinkR = 0.65 + 0.20 * (1.0 / aspect);
+          vec2 pinkCenter = vec2(aspect * 0.45 + sin(t*0.18)*0.12, 0.52 + cos(t*0.22)*0.10);
+          float pinkGlow = 1.0 - smoothstep(0.0, pinkR, distance(st, pinkCenter));
+
+          vec2 mouseAdj = uMouse; mouseAdj.x *= aspect;
+          float mouseInf = 1.0 - smoothstep(0.0, 0.6, distance(st, mouseAdj));
+
+          vec3 col = mix(deepBlue, midBlue, smoothstep(0.0, 0.6, m));
+          col = mix(col, lightBlue, smoothstep(0.5, 0.85, m));
+          col = mix(col, softPink, pinkGlow * 0.85);
+          col = mix(col, warmYellow, burst * 0.95);
+          col = mix(col, hotOrange, burst * smoothstep(0.5, 1.0, burst) * 1.0);
+          col = mix(col, warmYellow, mouseInf * 0.45);
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+
+    window.addEventListener('resize', () => {
+      renderer.setSize(section.clientWidth, section.clientHeight);
+      mat.uniforms.uResolution.value.set(section.clientWidth, section.clientHeight);
+    });
+
+    let time = 0;
+    function loop() {
+      smooth.x += (mouse.x - smooth.x) * 0.06;
+      smooth.y += (mouse.y - smooth.y) * 0.06;
+      mat.uniforms.uMouse.value.copy(smooth);
+      mat.uniforms.uTime.value = time;
+      time += 0.006;
+      renderer.render(scene, camera);
+      requestAnimationFrame(loop);
+    }
+    loop();
+  })();
+
+  // NAV scroll behaviour
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // STATS — Sapphire Dusk static background
+  (function() {
+    const canvas = document.getElementById('stats-canvas');
+    const section = document.getElementById('stats');
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(section.clientWidth, section.clientHeight);
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:       { value: 2.8 },
+        uResolution: { value: new THREE.Vector2(section.clientWidth, section.clientHeight) }
+      },
+      vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+      fragmentShader: `
+        precision highp float;
+        uniform float uTime;
+        uniform vec2 uResolution;
+
+        vec3 sapphire = vec3(0.05, 0.12, 0.45);
+        vec3 royal    = vec3(0.10, 0.28, 0.72);
+        vec3 indigo   = vec3(0.18, 0.10, 0.50);
+        vec3 blush    = vec3(0.88, 0.60, 0.72);
+        vec3 orange   = vec3(1.00, 0.42, 0.08);
+
+        float fbm(vec2 p, float t) {
+          float v = sin(p.x * 1.8 + t * 0.7) * cos(p.y * 1.5 - t * 0.5);
+          v += sin(p.x * 3.2 - t * 0.4) * sin(p.y * 2.8 + t * 0.6) * 0.5;
+          return v;
+        }
+
+        void main() {
+          vec2 uv = gl_FragCoord.xy / uResolution.xy;
+          float aspect = uResolution.x / uResolution.y;
+          vec2 st = uv; st.x *= aspect;
+          float t = uTime;
+          st.x += fbm(st * 1.2, t) * 0.20;
+          st.y += fbm(st * 1.5 + 1.7, t) * 0.17;
+          float diag = st.x * 0.58 - st.y * 0.82 + sin(t * 0.3) * 0.2;
+          float m = clamp(diag * 0.5 + 0.5, 0.0, 1.0);
+          float burstR = 0.45 + 0.22 * (1.0 / aspect);
+          vec2 bC = vec2(aspect * 0.80 + sin(t*0.25)*0.1, 0.84 + cos(t*0.2)*0.08);
+          float burst = 1.0 - smoothstep(0.0, burstR, distance(st, bC));
+          vec2 pC = vec2(aspect * 0.40 + sin(t*0.18)*0.1, 0.52 + cos(t*0.22)*0.1);
+          float blushG = 1.0 - smoothstep(0.0, 0.40 * (1.0 / aspect), distance(st, pC));
+          vec3 col = mix(sapphire, royal, smoothstep(0.0, 0.65, m));
+          col = mix(col, indigo, smoothstep(0.6, 1.0, 1.0 - m) * 0.6);
+          col = mix(col, blush, blushG * 0.55);
+          col = mix(col, orange, burst * 0.92);
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+    renderer.render(scene, camera);
+
+    new ResizeObserver(() => {
+      renderer.setSize(section.clientWidth, section.clientHeight);
+      mat.uniforms.uResolution.value.set(section.clientWidth, section.clientHeight);
+      renderer.render(scene, camera);
+    }).observe(section);
+  })();
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arata Studio × MAPP — Workplace Wellness Proposal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --ink: #0e0e0e;
+      --ink-mid: #3a3a3a;
+      --ink-muted: #888;
+      --off-white: #F7F6F3;
+      --border: rgba(255,255,255,0.12);
+      --accent: #1460FF;
+      --accent-2: #FF5C1A;
+      --serif: 'Syne', sans-serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #06101f;
+      font-family: var(--sans);
+      color: var(--white);
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent-2);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s, border 0.2s;
+      box-shadow: 0 0 0 1.5px rgba(0,0,0,0.25);
+    }
+    .cursor.big { width: 48px; height: 48px; background: rgba(255,92,26,0.25); border: 1.5px solid var(--accent-2); }
+    /* On light slides cursor flips to dark so it's always visible */
+    .cursor.on-light { background: var(--ink); box-shadow: 0 0 0 1.5px rgba(255,255,255,0.4); }
+    .cursor.on-light.big { background: rgba(14,14,14,0.15); border-color: var(--ink); }
+
+    /* ── SLIDE CONTAINER ── */
+    .deck {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+      transform: translateY(30px);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .slide.out-above {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+
+    /* ── SHARED BACKGROUND ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* light section slides override bg */
+    .slide.light-slide {
+      background: var(--off-white);
+      color: var(--ink);
+    }
+
+    /* ── NAV BAR ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-logo.dark { color: var(--ink); }
+
+    .slide-counter {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+    }
+
+    .slide-counter.dark { color: var(--ink-muted); }
+
+    /* ── PROGRESS BAR ── */
+    .progress {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 2px;
+      background: var(--accent-2);
+      z-index: 100;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── NAV ARROWS ── */
+    .nav-arrows {
+      position: fixed;
+      bottom: 2rem;
+      right: 3rem;
+      z-index: 100;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .arrow-btn {
+      width: 44px; height: 44px;
+      border: 1.5px solid rgba(255,255,255,0.9);
+      background: rgba(10, 20, 60, 0.75);
+      color: #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none;
+      font-size: 1rem;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    }
+
+    .arrow-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    .arrow-btn:disabled { opacity: 0.2; pointer-events: none; }
+
+    /* on light slides, arrows flip to dark */
+    .arrows-dark .arrow-btn {
+      border-color: rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.85);
+      color: var(--ink);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+    }
+
+    .arrows-dark .arrow-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── SLIDE CONTENT WRAPPER ── */
+    .slide-inner {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 5rem 5rem;
+    }
+
+    /* ── LABEL TAG ── */
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 1.5rem;
+    }
+
+    .label::before {
+      content: '';
+      display: inline-block;
+      width: 20px; height: 2px;
+      background: var(--accent-2);
+    }
+
+    .label.blue { color: var(--accent); }
+    .label.blue::before { background: var(--accent); }
+
+    /* ── SLIDE 1 — COVER ── */
+    #slide-1 .slide-inner {
+      justify-content: flex-end;
+      padding-bottom: 7rem;
+    }
+
+    .cover-client {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.72rem;
+      font-family: var(--serif);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    .cover-client::before {
+      content: '';
+      display: inline-block;
+      width: 28px; height: 2.5px;
+      background: var(--accent-2);
+      flex-shrink: 0;
+    }
+
+    .cover-h1 {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 7vw, 7rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 2rem;
+    }
+
+    .cover-h1 .outline {
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.5);
+      color: transparent;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .cover-meta-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .cover-meta-value {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.92);
+      font-weight: 400;
+    }
+
+    .cover-divider {
+      width: 1px; height: 40px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* ── SLIDE 2 — AGENDA ── */
+    #slide-2 .slide-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .agenda-h2 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+
+    .agenda-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .agenda-item {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.65);
+      font-weight: 300;
+      transition: color 0.2s;
+      cursor: default;
+    }
+
+    .agenda-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+    .agenda-item:hover { color: rgba(255,255,255,0.95); }
+
+    .agenda-num {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--accent-2);
+      font-weight: 500;
+      min-width: 24px;
+    }
+
+    /* ── SLIDE 3 — ABOUT ── */
+    #slide-3 .slide-inner {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .about-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .about-subtitle {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .about-body {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--ink-mid);
+      font-weight: 300;
+      max-width: 500px;
+    }
+
+    .stat-pills {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      padding: 0.6rem 1.2rem;
+      border: 1.5px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .stat-pill-num {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-pill-num span { color: var(--accent-2); }
+
+    .stat-pill-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .about-photo-wrap {
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      position: relative;
+      max-height: 70vh;
+    }
+
+    .about-photo-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .about-photo-badge {
+      position: absolute;
+      bottom: 1.5rem; left: 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.5rem 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ── SLIDE 4 — WHAT IS ── */
+    #slide-4 .slide-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .what-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    .what-body {
+      font-size: 1.1rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.65);
+      font-weight: 300;
+    }
+
+    .what-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* ── SLIDE 5 — EXPERIENCE ── */
+    #slide-5 .slide-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+      padding-top: 8rem;
+    }
+
+    .exp-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 2rem;
+    }
+
+    .exp-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .exp-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 300;
+    }
+
+    .exp-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+
+    .exp-dot {
+      width: 6px; height: 6px;
+      background: var(--accent-2);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .exp-img-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .exp-img-grid img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── SLIDE 6 — WHAT YOU GET ── */
+    #slide-6.light-slide .slide-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      padding-top: 8rem;
+    }
+
+    .get-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 2.5rem;
+    }
+
+    .get-col-title {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .get-col-title::before {
+      content: '';
+      display: inline-block;
+      width: 14px; height: 2px;
+      background: var(--accent);
+    }
+
+    .get-col-title.orange { color: var(--accent-2); }
+    .get-col-title.orange::before { background: var(--accent-2); }
+
+    .get-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .get-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid #E5E3DE;
+      font-size: 0.98rem;
+      color: var(--ink-mid);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .get-item:first-child { border-top: 1px solid #E5E3DE; }
+
+    .get-arrow { color: var(--accent); font-size: 0.82rem; flex-shrink: 0; margin-top: 2px; }
+    .get-arrow.orange { color: var(--accent-2); }
+
+    /* ── SLIDE 7 — TESTIMONIAL ── */
+    #slide-7 .slide-inner {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 10rem;
+    }
+
+    .quote-mark {
+      font-family: var(--serif);
+      font-size: 8rem;
+      line-height: 0.6;
+      color: rgba(255,255,255,0.07);
+      display: block;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .quote-text {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: -0.01em;
+      margin-bottom: 2.5rem;
+      max-width: 800px;
+    }
+
+    .quote-attr {
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .quote-attr span { color: var(--accent-2); }
+
+    /* ── SLIDE 8 — INVESTMENT ── */
+    #slide-8.light-slide .slide-inner {
+      padding-top: 7rem;
+    }
+
+    .inv-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .inv-subtitle {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .inv-table thead tr {
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .inv-table th {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.75rem 1rem 0.75rem 0;
+      text-align: left;
+    }
+
+    .inv-table tbody tr {
+      border-bottom: 1px solid #E5E3DE;
+      transition: background 0.15s;
+    }
+
+    .inv-table tbody tr:hover { background: rgba(20, 96, 255, 0.04); }
+
+    .inv-table td {
+      padding: 1rem 1rem 1rem 0;
+      font-size: 0.9rem;
+      color: var(--ink-mid);
+      font-weight: 300;
+      line-height: 1.5;
+      vertical-align: top;
+    }
+
+    .inv-table td.price {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .inv-table td.price .strikethrough {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: line-through;
+      display: block;
+      font-family: var(--sans);
+      font-weight: 300;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      margin-top: 0.3rem;
+    }
+
+    .badge.orange { background: var(--accent-2); }
+
+    .inv-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ink);
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .inv-total-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .inv-total-value {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .inv-total-value span { color: var(--accent-2); font-size: 1.1rem; }
+
+    /* ── SLIDE 9 — LET'S MAKE IT HAPPEN ── */
+    #slide-9 .slide-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .happen-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+    }
+
+    .happen-h2 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 5.5vw, 5.5rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 2.5rem;
+    }
+
+    .happen-h2 em {
+      font-style: italic;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .happen-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .happen-step {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 300;
+    }
+
+    .happen-step:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+
+    .happen-step-num {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--accent-2);
+      min-width: 36px;
+      line-height: 1;
+    }
+
+    /* ── SLIDE 10 — CONTACT ── */
+    #slide-10 .slide-inner {
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .contact-h2 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 3rem;
+    }
+
+    .contact-h2 em {
+      font-style: italic;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.45);
+      color: transparent;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .contact-link-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .contact-link-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      min-width: 60px;
+    }
+
+    .contact-link-value {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 300;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .contact-link-value:hover { color: var(--accent-2); border-color: var(--accent-2); }
+
+    .contact-branding {
+      position: absolute;
+      bottom: 4rem;
+      right: 5rem;
+      text-align: right;
+    }
+
+    .contact-studio-name {
+      font-family: var(--serif);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<div class="nav" id="main-nav">
+  <span class="nav-logo" id="nav-logo">Arata Studio</span>
+  <span class="slide-counter" id="counter">01 / 10</span>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress" id="progress"></div>
+
+<!-- ARROWS -->
+<div class="nav-arrows">
+  <button class="arrow-btn" id="btn-prev" disabled>←</button>
+  <button class="arrow-btn" id="btn-next">→</button>
+</div>
+
+<!-- ════════════════════════════════════ SLIDES ════════════════════════════════════ -->
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide active" id="slide-1">
+    <div class="slide-inner">
+      <p class="cover-client">Workplace Wellness Pop-Up · MAPP</p>
+      <h1 class="cover-h1">Personal<br>Colour<br><span class="outline">Analysis.</span></h1>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Presented by</span>
+          <span class="cover-meta-value">Veronica Cheung</span>
+        </div>
+        <div class="cover-divider"></div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Qualification</span>
+          <span class="cover-meta-value">JPCA M3 Certified</span>
+        </div>
+        <div class="cover-divider"></div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Studio</span>
+          <span class="cover-meta-value">arata-studio.com</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: AGENDA -->
+  <div class="slide" id="slide-2">
+    <div class="slide-inner">
+      <div>
+        <p class="label">Agenda</p>
+        <h2 class="agenda-h2">What's<br>Inside</h2>
+      </div>
+      <ul class="agenda-list">
+        <li class="agenda-item"><span class="agenda-num">01</span> About Veronica</li>
+        <li class="agenda-item"><span class="agenda-num">02</span> What is personal colour analysis</li>
+        <li class="agenda-item"><span class="agenda-num">03</span> The experience</li>
+        <li class="agenda-item"><span class="agenda-num">04</span> What you and your community get</li>
+        <li class="agenda-item"><span class="agenda-num">05</span> Investment</li>
+        <li class="agenda-item"><span class="agenda-num">06</span> Let's make it happen</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: ABOUT VERONICA -->
+  <div class="slide light-slide" id="slide-3">
+    <div class="slide-inner">
+      <div>
+        <p class="label blue">About</p>
+        <h2 class="about-h2">About<br>Veronica</h2>
+        <p class="about-subtitle">From Tech Product Design to Personal Colour Analysis</p>
+        <p class="about-body">Blending a background in tech product design with the art of personal colour, this approach focuses on strategy, visual harmony and human perception. Guided by the rigorous methodology of the Japan Personal Colour Association, every consultation helps unite natural aesthetics with your unique personal branding.</p>
+        <div class="stat-pills">
+          <div class="stat-pill">
+            <span class="stat-pill-num">60<span>+</span></span>
+            <span class="stat-pill-label">Clients</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-pill-num">3</span>
+            <span class="stat-pill-label">Markets</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-pill-num">JPCA</span>
+            <span class="stat-pill-label">M3 Qualified</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-photo-wrap">
+        <img src="image/about_veronica.png" alt="Veronica Cheung" />
+        <span class="about-photo-badge">JPCA M3 Certified</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: WHAT IS COLOUR ANALYSIS -->
+  <div class="slide" id="slide-4">
+    <div class="slide-inner">
+      <div>
+        <p class="label">What We Do</p>
+        <h2 class="what-h2">What is Personal<br>Colour Analysis?</h2>
+        <p class="what-body">Your colours already exist. We just help you find them.<br><br>Personal colour analysis identifies the unique spectrum of shades that work with your skin tone, eye colour, and hair — so you always know exactly what to reach for.</p>
+      </div>
+      <img class="what-img" src="image/1on1.png" alt="Colour analysis session" />
+    </div>
+  </div>
+
+  <!-- SLIDE 5: THE EXPERIENCE -->
+  <div class="slide" id="slide-5">
+    <div class="slide-inner">
+      <div>
+        <p class="label">The Session</p>
+        <h2 class="exp-h2">The<br>Experience</h2>
+        <p style="font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:1.5rem;letter-spacing:0.04em;">Every session at 1 New Oxford Street includes:</p>
+        <ul class="exp-list">
+          <li class="exp-item"><span class="exp-dot"></span>Colour confidence quiz</li>
+          <li class="exp-item"><span class="exp-dot"></span>Professional draping test</li>
+          <li class="exp-item"><span class="exp-dot"></span>Instant season reveal</li>
+          <li class="exp-item"><span class="exp-dot"></span>Makeup and hair colour guidance</li>
+          <li class="exp-item"><span class="exp-dot"></span>Same-day full written report</li>
+        </ul>
+      </div>
+      <div class="exp-img-grid">
+        <img src="image/pccs-card.JPG" alt="PCCS colour card" />
+        <img src="image/1on1-2.png" alt="1 on 1 session" />
+        <img src="image/color-wheel.png" alt="Colour wheel" style="grid-column:1/-1;aspect-ratio:2/1;" />
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: WHAT YOU GET -->
+  <div class="slide light-slide" id="slide-6">
+    <div class="slide-inner" style="display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:center;padding-top:7rem;">
+      <div>
+        <p class="label blue">The Value</p>
+        <h2 class="get-h2">What You &amp;<br>Your Community Get</h2>
+        <div style="margin-top:1.5rem;">
+          <p class="get-col-title" style="margin-bottom:0.75rem;">For Your Tenants</p>
+          <ul class="get-list" style="margin-bottom:1.75rem;">
+            <li class="get-item"><span class="get-arrow">→</span>Clarity they carry with them every day</li>
+            <li class="get-item"><span class="get-arrow">→</span>A same-day report they keep and use long after</li>
+            <li class="get-item"><span class="get-arrow">→</span>A result they would happily pay for privately</li>
+          </ul>
+          <p class="get-col-title orange" style="margin-bottom:0.75rem;">For MAPP</p>
+          <ul class="get-list">
+            <li class="get-item"><span class="get-arrow orange">→</span>A wellness event that reflects MAPP's commitment to exceptional occupier experience</li>
+            <li class="get-item"><span class="get-arrow orange">→</span>Community that extends beyond the office</li>
+            <li class="get-item"><span class="get-arrow orange">→</span>Premium activation at a partnership price</li>
+          </ul>
+        </div>
+      </div>
+      <div style="height:100%;max-height:80vh;overflow:hidden;position:relative;">
+        <img src="image/hero.jpg" alt="Colour analysis in action" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(247,246,243,0.5) 0%,transparent 40%);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: TESTIMONIAL -->
+  <div class="slide" id="slide-7">
+    <div class="slide-inner">
+      <span class="quote-mark">"</span>
+      <blockquote class="quote-text">Veronica has such a warm and approachable way of guiding the process. It was both insightful and empowering, and I now feel much more confident in choosing colours that truly suit me.</blockquote>
+      <p class="quote-attr">— <span>Olivia Hsueh</span>, Marketing Planner, ETUDE</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: INVESTMENT -->
+  <div class="slide light-slide" id="slide-8">
+    <div class="slide-inner">
+      <p class="label blue">Pricing</p>
+      <h2 class="inv-h2">First-Collaboration Offer for MAPP</h2>
+      <p class="inv-subtitle">3 discounted sessions + 3 standard sessions — full day total: 6 sessions</p>
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th style="width:45%">Session</th>
+            <th style="width:35%">What's included</th>
+            <th style="width:20%">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Standard Private Rate
+            </td>
+            <td>50-min session · Pre-session prep · Professional draping · Instant reveal · Same-day report</td>
+            <td class="price">
+              <span class="strikethrough">£150</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Participants 1–3
+              <br><span class="badge orange">50% Off · First Collaboration</span>
+            </td>
+            <td>50-min session · Pre-session prep · Professional draping · Instant reveal · Same-day report</td>
+            <td class="price">£75</td>
+          </tr>
+          <tr>
+            <td>
+              Participants 4–6
+              <br><span class="badge">Standard Rate</span>
+            </td>
+            <td>50-min session · Pre-session prep · Professional draping · Instant reveal · Same-day report</td>
+            <td class="price">£150</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="inv-total">
+        <div>
+          <p class="inv-total-label">Full Day Total — 6 Sessions</p>
+        </div>
+        <p class="inv-total-value">£675 <span>incl. discount</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: LET'S MAKE IT HAPPEN -->
+  <div class="slide" id="slide-9">
+    <div class="slide-inner">
+      <img class="happen-img" src="image/workshop.jpg" alt="Workshop session" />
+      <div>
+        <p class="label">Next Steps</p>
+        <h2 class="happen-h2">Let's Make<br><em>This Happen.</em></h2>
+        <ol class="happen-steps">
+          <li class="happen-step"><span class="happen-step-num">01</span>Confirm date</li>
+          <li class="happen-step"><span class="happen-step-num">02</span>Agree on space and logistics</li>
+          <li class="happen-step"><span class="happen-step-num">03</span>Let your tenants know — we'll take it from there</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: CONTACT -->
+  <div class="slide" id="slide-10">
+    <div class="slide-inner">
+      <p class="label">Get in Touch</p>
+      <h2 class="contact-h2">Ready to<br><em>Talk?</em></h2>
+      <div class="contact-links">
+        <div class="contact-link-row">
+          <span class="contact-link-label">Website</span>
+          <a class="contact-link-value" href="https://arata-studio.com">arata-studio.com</a>
+        </div>
+        <div class="contact-link-row">
+          <span class="contact-link-label">Email</span>
+          <a class="contact-link-value" href="mailto:color@veronicacheung.com">color@veronicacheung.com</a>
+        </div>
+        <div class="contact-link-row">
+          <span class="contact-link-label">Phone</span>
+          <a class="contact-link-value" href="tel:07835289217">07835 289 217</a>
+        </div>
+      </div>
+      <div class="contact-branding">
+        <p class="contact-studio-name">Arata Studio © 2026</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- THREE.JS GRADIENT -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+// ── BACKGROUND GRADIENT ──
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const mouse = new THREE.Vector2(0.5,0.5);
+  const smooth = new THREE.Vector2(0.5,0.5);
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX / window.innerWidth;
+    mouse.y = 1 - e.clientY / window.innerHeight;
+  });
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime:       { value: 0 },
+      uMouse:      { value: new THREE.Vector2(0.5,0.5) },
+      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+    },
+    vertexShader: `void main(){ gl_Position=vec4(position,1.0); }`,
+    fragmentShader: `
+      precision highp float;
+      uniform float uTime; uniform vec2 uMouse, uResolution;
+      vec3 sapphire = vec3(0.05,0.12,0.45);
+      vec3 royal    = vec3(0.10,0.28,0.72);
+      vec3 indigo   = vec3(0.18,0.10,0.50);
+      vec3 blush    = vec3(0.88,0.60,0.72);
+      vec3 orange   = vec3(1.00,0.42,0.08);
+      float fbm(vec2 p,float t){
+        float v=sin(p.x*1.8+t*0.7)*cos(p.y*1.5-t*0.5);
+        v+=sin(p.x*3.2-t*0.4)*sin(p.y*2.8+t*0.6)*0.5;
+        return v;
+      }
+      void main(){
+        vec2 uv=gl_FragCoord.xy/uResolution.xy;
+        float aspect=uResolution.x/uResolution.y;
+        vec2 st=uv; st.x*=aspect;
+        float t=uTime;
+        st.x+=fbm(st*1.2,t)*0.20; st.y+=fbm(st*1.5+1.7,t)*0.17;
+        float diag=st.x*0.58-st.y*0.82+sin(t*0.3)*0.2;
+        float m=clamp(diag*0.5+0.5,0.0,1.0);
+        float burstR=0.45+0.22*(1.0/aspect);
+        vec2 bC=vec2(aspect*0.80+sin(t*0.25)*0.1,0.84+cos(t*0.2)*0.08);
+        float burst=1.0-smoothstep(0.0,burstR,distance(st,bC));
+        vec2 pC=vec2(aspect*0.40+sin(t*0.18)*0.1,0.52+cos(t*0.22)*0.1);
+        float blushG=1.0-smoothstep(0.0,0.40*(1.0/aspect),distance(st,pC));
+        vec3 col=mix(sapphire,royal,smoothstep(0.0,0.65,m));
+        col=mix(col,indigo,smoothstep(0.6,1.0,1.0-m)*0.6);
+        col=mix(col,blush,blushG*0.55);
+        col=mix(col,orange,burst*0.92);
+        vec2 ma=uMouse; ma.x*=aspect;
+        col=mix(col,vec3(1.0,0.72,0.2),(1.0-smoothstep(0.0,0.5,distance(st,ma)))*0.3);
+        gl_FragColor=vec4(col,1.0);
+      }
+    `
+  });
+
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat));
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  });
+
+  let time = 0;
+  function loop() {
+    smooth.x += (mouse.x - smooth.x) * 0.05;
+    smooth.y += (mouse.y - smooth.y) * 0.05;
+    mat.uniforms.uMouse.value.copy(smooth);
+    mat.uniforms.uTime.value = time;
+    time += 0.005;
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ── SLIDE LOGIC ──
+const slides = document.querySelectorAll('.slide');
+const counter = document.getElementById('counter');
+const progress = document.getElementById('progress');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const navLogo = document.getElementById('nav-logo');
+const navCounter = document.getElementById('counter');
+const bgCanvas = document.getElementById('bg-canvas');
+const cursor = document.getElementById('cursor');
+let current = 0;
+const total = slides.length;
+
+const lightSlides = new Set([2, 5, 7]); // 0-indexed: slide 3=About, 6=What You Get, 8=Investment
+
+function goTo(idx) {
+  if (idx < 0 || idx >= total) return;
+  slides[current].classList.remove('active');
+  slides[current].classList.add('out-above');
+  setTimeout(() => slides[current].classList.remove('out-above'), 700);
+
+  current = idx;
+  slides[current].classList.add('active');
+
+  // Update counter
+  const num = String(current + 1).padStart(2,'0');
+  counter.textContent = `${num} / ${String(total).padStart(2,'0')}`;
+
+  // Progress bar
+  progress.style.width = `${((current + 1) / total) * 100}%`;
+
+  // Nav style
+  const isLight = lightSlides.has(current);
+  navLogo.className = isLight ? 'nav-logo dark' : 'nav-logo';
+  navCounter.className = isLight ? 'slide-counter dark' : 'slide-counter';
+  bgCanvas.style.display = isLight ? 'none' : 'block';
+  document.querySelector('.nav-arrows').classList.toggle('arrows-dark', isLight);
+  cursor.classList.toggle('on-light', isLight);
+
+  // Buttons
+  btnPrev.disabled = current === 0;
+  btnNext.disabled = current === total - 1;
+}
+
+btnNext.addEventListener('click', () => goTo(current + 1));
+btnPrev.addEventListener('click', () => goTo(current - 1));
+
+// Keyboard
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') goTo(current + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+});
+
+// Touch/swipe
+let touchStartX = 0;
+window.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) dx < 0 ? goTo(current + 1) : goTo(current - 1);
+});
+
+// Custom cursor
+window.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('button, a').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+});
+
+// Init
+goTo(0);
+</script>
+
+</body>
+</html>
